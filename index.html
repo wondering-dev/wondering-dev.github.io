@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import * as THREE from "https://cdn.skypack.dev/three";
+
+      let scene, camera, renderer, particles;
+
+      function init() {
+        // Create canvas for circle texture
+        const canvas = document.createElement("canvas");
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext("2d");
+
+        // Draw circle
+        ctx.beginPath();
+        ctx.arc(32, 32, 30, 0, 2 * Math.PI);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+
+        const texture = new THREE.CanvasTexture(canvas);
+
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+
+        renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document
+          .getElementById("three-container")
+          .appendChild(renderer.domElement);
+
+        const geometry = new THREE.BufferGeometry();
+        const vertices = [];
+
+        for (let i = 0; i < 5000; i++) {
+          const x = (Math.random() - 0.5) * 2000;
+          const y = (Math.random() - 0.5) * 2000;
+          const z = (Math.random() - 0.5) * 2000;
+          vertices.push(x, y, z);
+        }
+
+        geometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(vertices, 3)
+        );
+
+        const material = new THREE.PointsMaterial({
+          size: 5,
+          sizeAttenuation: false,
+          map: texture,
+          alphaTest: 0.5,
+          transparent: true,
+        });
+        particles = new THREE.Points(geometry, material);
+
+        scene.add(particles);
+        camera.position.z = 1000;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        particles.rotation.x += 0.0005;
+        particles.rotation.y += 0.0005;
+
+        renderer.render(scene, camera);
+      }
+
+      init();
+      animate();
+    </script>
+    <script>
+      const circles = document.querySelectorAll("#visual circle");
+      let time = 0;
+
+      function animateSvg() {
+        time += 0.01;
+        circles.forEach((circle, i) => {
+          const originalX = parseFloat(circle.getAttribute("data-original-x"));
+          const originalY = parseFloat(circle.getAttribute("data-original-y"));
+          circle.setAttribute("cx", originalX + 10 * Math.sin(time + i));
+          circle.setAttribute("cy", originalY + 10 * Math.cos(time + i));
+        });
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        // Existing particle animation
+        particles.rotation.x += 0.005 * (Math.random() - 0.5);
+        particles.rotation.y += 0.005 * (Math.random() - 0.5);
+        renderer.render(scene, camera);
+
+        // New SVG animation
+        animateSvg();
+      }
+    </script>
+    <style>
+      #visual {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+      }
+    </style>
+    <title>💭</title>
+  </head>
+  <body class="bg-transparent">
+    <div
+      id="three-container"
+      style="position: fixed; top: 0; left: 0; z-index: -1"
+    ></div>
+    <svg
+      id="visual"
+      style="position: fixed; top: 0; left: 0; z-index: -2"
+      viewBox="0 0 960 540"
+      width="100%"
+      height="100%"
+      preserveAspectRatio="xMidYMid slice"
+    >
+      <defs>
+        <filter
+          id="blur1"
+          x="-10%"
+          y="-10%"
+          width="120%"
+          height="120%"
+          filterUnits="userSpaceOnUse"
+          color-interpolation-filters="sRGB"
+        >
+          <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            result="shape"
+          ></feBlend>
+          <feGaussianBlur
+            stdDeviation="163"
+            result="effect1_foregroundBlur"
+          ></feGaussianBlur>
+        </filter>
+      </defs>
+      <rect width="960" height="540" fill="#4FACF7"></rect>
+      <g filter="url(#blur1)">
+        <circle cx="10" cy="492" fill="#9dcff7" r="363"></circle>
+        <circle cx="775" cy="23" fill="#4FACF7" r="363"></circle>
+        <circle cx="503" cy="310" fill="#9dcff7" r="363"></circle>
+        <circle cx="758" cy="431" fill="#9dcff7" r="363"></circle>
+        <circle cx="941" cy="519" fill="#4FACF7" r="363"></circle>
+        <circle cx="284" cy="503" fill="#9dcff7" r="363"></circle>
+      </g>
+    </svg>
+    <div class="flex flex-col h-screen justify-center items-center">
+      <h1 class="text-4xl font-bold text-blue-950">Coming soon</h1>
+      <p class="text-blue-950 text-center my-3 px-6">
+        We're working on something special, 💭 will be back soon.
+      </p>
+    </div>
+  </body>
+</html>
